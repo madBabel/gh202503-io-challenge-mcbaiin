@@ -1,7 +1,7 @@
 name: Autograding Tests
 'on':
-  push:
-  workflow_dispatch:
+- push
+- repository_dispatch
 permissions:
   checks: write
   actions: read
@@ -13,21 +13,22 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-    - name: Setup GitHub CLI
-      run: echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
     - name: check job execution
       id: check-job-execution
-      run: |
-        COMPLETED_RUNS=$(gh run list --repo ${{ github.repository }} --workflow 'Workflow Execution' --json conclusion)
-        if echo "$COMPLETED_RUNS" | grep -q 'success'; then
-          echo "result=success" >> $GITHUB_ENV
-        else
-          echo "result=failure" >> $GITHUB_ENV
-        fi
+      uses: classroom-resources/autograding-io-grader@v1
+      with:
+        test-name: check job execution
+        setup-command: echo ${{ secrets.GITHUB_TOKEN }} | gh auth login --with-token
+        command: gh run list --repo ${{ github.repository }} --workflow 'Workflow
+          Execution' --json conclusion | grep success
+        input: ''
+        expected-output: ".*success.*"
+        comparison-method: regex
+        timeout: 10
+        max-score: 100
     - name: Autograding Reporter
       uses: classroom-resources/autograding-grading-reporter@v1
       env:
-        CHECK-JOB-EXECUTION_RESULTS: "${{ env.result }}"
-        
+        CHECK-JOB-EXECUTION_RESULTS: "${{steps.check-job-execution.outputs.result}}"
       with:
         runners: check-job-execution
