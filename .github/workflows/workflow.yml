@@ -13,7 +13,7 @@ jobs:
     build:
         runs-on: ubuntu-latest
         outputs:
-            build_status: ${{ steps.build.outputs.build_status }}
+            build_status: ${{ steps.build.outputs.build_status == 'SI' && 'success' || 'fail' }}
         steps:      
             - name: 'Print GITHUB_OUTPUT path'       
               run: |
@@ -22,7 +22,7 @@ jobs:
               id: build
               run: |
                 echo "Building"
-                echo "build_status=${{ inputs.result == 'SI' && 'success' || 'fail' }}" >> "$GITHUB_OUTPUT"
+                echo "build_status=${{ inputs.result }}" >> "$GITHUB_OUTPUT"
 
     deploy:
         runs-on: ubuntu-latest
