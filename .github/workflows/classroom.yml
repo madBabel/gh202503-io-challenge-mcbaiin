@@ -28,5 +28,6 @@ jobs:
       uses: classroom-resources/autograding-grading-reporter@v1
       env:
         CHECK-JOB-EXECUTION_RESULTS: "${{ env.result }}"
+        
       with:
         runners: check-job-execution
